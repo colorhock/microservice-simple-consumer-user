@@ -1,28 +1,26 @@
 package com.itmuch.controller;
 
-import com.itmuch.dao.dao.UserRepository;
-import com.itmuch.dao.entity.UserPo;
+
+import com.itmuch.pojo.UserPo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class MovieController {
 
     @Autowired
-    private UserRepository userRepository;
+    private RestTemplate restTemplate;
+
+    @Value("user.userServiceUrl")
+    private String userServiceUrl;
 
     @GetMapping("/{id}")
     public UserPo findById(@PathVariable Long id) {
-        UserPo userPoForSel = new UserPo();
-        userPoForSel.setId(id);
-        Example<UserPo> userPoExample =  Example.of(userPoForSel);
-        Optional<UserPo> findOne = userRepository.findOne(userPoExample);
-        return  findOne.isPresent() == true ? findOne.get() : null;
+        return this.restTemplate.getForObject(userServiceUrl + id, UserPo.class);
     }
 
 }
